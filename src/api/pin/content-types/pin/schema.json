@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pins",
+  "info": {
+    "singularName": "pin",
+    "pluralName": "pins",
+    "displayName": "Pin"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "rarity": {
+      "type": "enumeration",
+      "enum": [
+        "common",
+        "rare",
+        "epic",
+        "legendary"
+      ]
+    },
+    "pin_instances": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::pin-instance.pin-instance",
+      "mappedBy": "pin"
+    }
+  }
+}

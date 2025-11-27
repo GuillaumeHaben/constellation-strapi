@@ -66,6 +66,15 @@
       "inversedBy": "users",
       "configurable": false
     },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid"
+    },
     "pin_instances": {
       "type": "relation",
       "relation": "oneToMany",

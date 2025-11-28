@@ -81,7 +81,7 @@
       "target": "api::pin-instance.pin-instance",
       "mappedBy": "owner"
     },
-    "picture": {
+    "profilePicture": {
       "type": "media",
       "multiple": false,
       "allowedTypes": [
@@ -122,6 +122,21 @@
       "type": "string"
     },
     "position": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "float"
+    },
+    "longitude": {
+      "type": "float"
+    },
+    "h3index": {
+      "type": "string"
+    },
+    "geocodedAt": {
+      "type": "datetime"
+    },
+    "website": {
       "type": "string"
     }
   }

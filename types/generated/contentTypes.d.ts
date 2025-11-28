@@ -400,6 +400,35 @@ export interface ApiClubClub extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiHeatMapHeatMap extends Struct.CollectionTypeSchema {
+  collectionName: 'heat_maps';
+  info: {
+    displayName: 'HeatMap';
+    pluralName: 'heat-maps';
+    singularName: 'heat-map';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    count: Schema.Attribute.Integer;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    h3Index: Schema.Attribute.UID;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::heat-map.heat-map'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPinInstancePinInstance extends Struct.CollectionTypeSchema {
   collectionName: 'pin_instances';
   info: {
@@ -942,9 +971,12 @@ export interface PluginUsersPermissionsUser
     esaSite: Schema.Attribute.String;
     facebook: Schema.Attribute.String;
     firstName: Schema.Attribute.String;
+    geocodedAt: Schema.Attribute.DateTime;
     github: Schema.Attribute.String;
+    h3index: Schema.Attribute.String;
     instagram: Schema.Attribute.String;
     lastName: Schema.Attribute.String;
+    latitude: Schema.Attribute.Float;
     linkedin: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -952,18 +984,19 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    longitude: Schema.Attribute.Float;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
     phoneNumber: Schema.Attribute.String;
-    picture: Schema.Attribute.Media<'images'>;
     pin_instances: Schema.Attribute.Relation<
       'oneToMany',
       'api::pin-instance.pin-instance'
     >;
     position: Schema.Attribute.String;
+    profilePicture: Schema.Attribute.Media<'images'>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
@@ -982,6 +1015,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 3;
       }>;
+    website: Schema.Attribute.String;
   };
 }
 
@@ -996,6 +1030,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::club.club': ApiClubClub;
+      'api::heat-map.heat-map': ApiHeatMapHeatMap;
       'api::pin-instance.pin-instance': ApiPinInstancePinInstance;
       'api::pin.pin': ApiPinPin;
       'plugin::content-releases.release': PluginContentReleasesRelease;

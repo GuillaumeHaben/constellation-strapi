@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "heat_maps",
+  "info": {
+    "singularName": "heat-map",
+    "pluralName": "heat-maps",
+    "displayName": "HeatMap"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "h3Index": {
+      "type": "uid"
+    },
+    "count": {
+      "type": "integer"
+    }
+  }
+}

@@ -15,11 +15,14 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.4.2",
     "@strapi/client": "^1.5.0",
     "@strapi/plugin-cloud": "5.23.6",
     "@strapi/plugin-users-permissions": "5.23.6",
     "@strapi/strapi": "5.23.6",
     "better-sqlite3": "11.3.0",
+    "h3-js": "^4.3.0",
+    "node-geocoder": "^4.4.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",

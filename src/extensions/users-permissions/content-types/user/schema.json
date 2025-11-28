@@ -80,6 +80,49 @@
       "relation": "oneToMany",
       "target": "api::pin-instance.pin-instance",
       "mappedBy": "owner"
+    },
+    "picture": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "birthday": {
+      "type": "date"
+    },
+    "country": {
+      "type": "string"
+    },
+    "esaSite": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "phoneNumber": {
+      "type": "string"
+    },
+    "instagram": {
+      "type": "string"
+    },
+    "linkedin": {
+      "type": "string"
+    },
+    "facebook": {
+      "type": "string"
+    },
+    "github": {
+      "type": "string"
+    },
+    "twitter": {
+      "type": "string"
+    },
+    "directorate": {
+      "type": "string"
+    },
+    "position": {
+      "type": "string"
     }
   }
 }

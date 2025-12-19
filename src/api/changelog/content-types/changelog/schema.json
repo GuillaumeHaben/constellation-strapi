@@ -15,7 +15,7 @@
       "type": "string"
     },
     "date": {
-      "type": "date"
+      "type": "datetime"
     },
     "title": {
       "type": "string"

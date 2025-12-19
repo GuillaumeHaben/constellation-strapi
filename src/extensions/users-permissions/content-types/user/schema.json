@@ -138,6 +138,9 @@
     },
     "website": {
       "type": "string"
+    },
+    "lastSeenChangelogAt": {
+      "type": "datetime"
     }
   }
 }

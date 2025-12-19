@@ -387,7 +387,7 @@ export interface ApiChangelogChangelog extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    date: Schema.Attribute.Date;
+    date: Schema.Attribute.DateTime;
     description: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -1009,6 +1009,7 @@ export interface PluginUsersPermissionsUser
     h3index: Schema.Attribute.String;
     instagram: Schema.Attribute.String;
     lastName: Schema.Attribute.String;
+    lastSeenChangelogAt: Schema.Attribute.DateTime;
     latitude: Schema.Attribute.Float;
     linkedin: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;

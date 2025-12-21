@@ -75,11 +75,11 @@
     "slug": {
       "type": "uid"
     },
-    "pin_instances": {
+    "pins": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::pin-instance.pin-instance",
-      "mappedBy": "owner"
+      "relation": "manyToMany",
+      "target": "api::pin.pin",
+      "mappedBy": "users"
     },
     "profilePicture": {
       "type": "media",

@@ -1,0 +1,28 @@
+{
+    "kind": "collectionType",
+    "collectionName": "encounters",
+    "info": {
+        "singularName": "encounter",
+        "pluralName": "encounters",
+        "displayName": "Encounter"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "userLow": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "plugin::users-permissions.user"
+        },
+        "userHigh": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "plugin::users-permissions.user"
+        },
+        "validatedAt": {
+            "type": "datetime"
+        }
+    }
+}

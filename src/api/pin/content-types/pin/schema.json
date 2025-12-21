@@ -26,19 +26,27 @@
       ]
     },
     "rarity": {
+      "type": "decimal",
+      "default": 1
+    },
+    "users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "pins"
+    },
+    "status": {
       "type": "enumeration",
+      "default": "pending",
       "enum": [
-        "common",
-        "rare",
-        "epic",
-        "legendary"
+        "pending",
+        "approved"
       ]
     },
-    "pin_instances": {
+    "suggestedBy": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::pin-instance.pin-instance",
-      "mappedBy": "pin"
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
     }
   }
 }

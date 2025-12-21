@@ -433,6 +433,42 @@ export interface ApiClubClub extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiEncounterEncounter extends Struct.CollectionTypeSchema {
+  collectionName: 'encounters';
+  info: {
+    displayName: 'Encounter';
+    pluralName: 'encounters';
+    singularName: 'encounter';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::encounter.encounter'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userHigh: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    userLow: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    validatedAt: Schema.Attribute.DateTime;
+  };
+}
+
 export interface ApiHeatMapHeatMap extends Struct.CollectionTypeSchema {
   collectionName: 'heat_maps';
   info: {
@@ -462,39 +498,6 @@ export interface ApiHeatMapHeatMap extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiPinInstancePinInstance extends Struct.CollectionTypeSchema {
-  collectionName: 'pin_instances';
-  info: {
-    displayName: 'PinInstance';
-    pluralName: 'pin-instances';
-    singularName: 'pin-instance';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::pin-instance.pin-instance'
-    > &
-      Schema.Attribute.Private;
-    owner: Schema.Attribute.Relation<
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    pin: Schema.Attribute.Relation<'manyToOne', 'api::pin.pin'>;
-    publishedAt: Schema.Attribute.DateTime;
-    quantity: Schema.Attribute.Integer;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiPinPin extends Struct.CollectionTypeSchema {
   collectionName: 'pins';
   info: {
@@ -515,17 +518,21 @@ export interface ApiPinPin extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::pin.pin'> &
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
-    pin_instances: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::pin-instance.pin-instance'
-    >;
     publishedAt: Schema.Attribute.DateTime;
-    rarity: Schema.Attribute.Enumeration<
-      ['common', 'rare', 'epic', 'legendary']
+    rarity: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<1>;
+    status: Schema.Attribute.Enumeration<['pending', 'approved']> &
+      Schema.Attribute.DefaultTo<'pending'>;
+    suggestedBy: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
     >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    users: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -1025,10 +1032,7 @@ export interface PluginUsersPermissionsUser
         minLength: 6;
       }>;
     phoneNumber: Schema.Attribute.String;
-    pin_instances: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::pin-instance.pin-instance'
-    >;
+    pins: Schema.Attribute.Relation<'manyToMany', 'api::pin.pin'>;
     position: Schema.Attribute.String;
     profilePicture: Schema.Attribute.Media<'images'>;
     provider: Schema.Attribute.String;
@@ -1065,8 +1069,8 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::changelog.changelog': ApiChangelogChangelog;
       'api::club.club': ApiClubClub;
+      'api::encounter.encounter': ApiEncounterEncounter;
       'api::heat-map.heat-map': ApiHeatMapHeatMap;
-      'api::pin-instance.pin-instance': ApiPinInstancePinInstance;
       'api::pin.pin': ApiPinPin;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

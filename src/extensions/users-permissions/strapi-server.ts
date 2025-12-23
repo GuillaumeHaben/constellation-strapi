@@ -60,6 +60,25 @@ export default (plugin: any) => {
     const originalMe = plugin.controllers.user.me;
     const originalUpdate = plugin.controllers.user.update;
     const originalDestroy = plugin.controllers.user.destroy;
+    const originalRegister = plugin.controllers.auth.register;
+
+    // Override register to enforce domain restriction
+    plugin.controllers.auth.register = async (ctx: any) => {
+        const { email } = ctx.request.body;
+
+        if (!email) {
+            return originalRegister(ctx); // Let original handle missing email error
+        }
+
+        const allowedDomains = ['@esa.int', '@ext.esa.int'];
+        const isAllowed = allowedDomains.some(domain => email.toLowerCase().endsWith(domain));
+
+        if (!isAllowed) {
+            return ctx.badRequest('Registration is restricted to @esa.int and @ext.esa.int domains.');
+        }
+
+        return originalRegister(ctx);
+    };
 
     // Override find to sanitize private fields
     plugin.controllers.user.find = async (ctx: any) => {

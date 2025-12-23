@@ -3,7 +3,7 @@
  */
 
 import { factories } from '@strapi/strapi'
-import { cellToBoundary } from 'h3-js';
+import { cellToLatLng } from 'h3-js';
 
 export default factories.createCoreController('api::heat-map.heat-map', ({ strapi }) => ({
     async getGeoJson(ctx) {
@@ -13,16 +13,13 @@ export default factories.createCoreController('api::heat-map.heat-map', ({ strap
             });
 
             const features = entries.map((entry: any) => {
-                const boundary = cellToBoundary(entry.h3Index);
-                // Convert boundary (lat, lng pairs) to GeoJSON format (lng, lat pairs and closing the polygon)
-                const coordinates = boundary.map(([lat, lng]) => [lng, lat]);
-                coordinates.push(coordinates[0]); // Close the polygon
+                const [lat, lng] = cellToLatLng(entry.h3Index);
 
                 return {
                     type: 'Feature',
                     geometry: {
-                        type: 'Polygon',
-                        coordinates: [coordinates],
+                        type: 'Point',
+                        coordinates: [lng, lat],
                     },
                     properties: {
                         count: entry.count,

@@ -53,7 +53,9 @@ async function updateH3Index(data: any, previousData: any = null) {
             const newH3Index = h3.latLngToCell(geo.latitude, geo.longitude, H3_RESOLUTION);
             console.log(`[User Lifecycle] New H3 Index: ${newH3Index}, Old H3 Index: ${previousData?.h3index}`);
 
-            if (newH3Index !== previousData?.h3index) {
+            // STRICT CHECK: Only proceed if the index is actually different
+            // This prevents race conditions where multiple localized updates trigger multiple increments
+            if (newH3Index && newH3Index !== previousData?.h3index) {
                 if (previousData?.h3index) {
                     console.log(`[User Lifecycle] Changing location. Decrementing old H3: ${previousData.h3index}`);
                     await decrementHeatMap(previousData.h3index);
@@ -143,6 +145,7 @@ async function decrementHeatMap(h3index: string) {
 
             if (existing.count <= 1) {
                 // @ts-ignore - Delete the entry if count would become 0
+                console.log(`[HeatMap] Count is ${existing.count}, deleting documentId: ${existing.documentId}`);
                 await strapi.documents('api::heat-map.heat-map').delete({
                     documentId: existing.documentId,
                 });
@@ -183,16 +186,69 @@ export default {
     },
 
     async beforeUpdate(event: any) {
-        console.log('[User Lifecycle] beforeUpdate triggered');
+        const requestId = Math.random().toString(36).substring(7);
+        console.log(`[User Lifecycle] beforeUpdate triggered (ReqID: ${requestId})`);
         const { data, where } = event.params;
 
         // Fetch existing data to compare and handle count updates
         try {
             // @ts-ignore
-            const previousData = await strapi.query('plugin::users-permissions.user').findOne({ where });
+            const previousData = await strapi.db.query('plugin::users-permissions.user').findOne({ where });
             await updateH3Index(data, previousData);
         } catch (error) {
-            console.error('[User Lifecycle] Error fetching previous data:', error);
+            console.error(`[User Lifecycle] Error fetching previous data (ReqID: ${requestId}):`, error);
+        }
+    },
+
+    async beforeDelete(event: any) {
+        console.log('[User Lifecycle] beforeDelete triggered');
+        const { where } = event.params;
+        console.log('[User Lifecycle] where params:', JSON.stringify(where));
+
+        try {
+            // Fetch user data before deletion to capture h3index and pins
+            // @ts-ignore
+            const user = await strapi.db.query('plugin::users-permissions.user').findOne({
+                where,
+                populate: ['pins']
+            });
+            console.log('[User Lifecycle] Found user for deletion:', user ? `ID=${user.id}` : 'null');
+
+            if (user) {
+                event.state = {
+                    h3index: user.h3index,
+                    pinIds: user.pins?.map((p: any) => p.id) || []
+                };
+                console.log(`[User Lifecycle] Captured state for deletion: H3=${user.h3index}, Pins=${event.state.pinIds.length}`);
+            }
+        } catch (error) {
+            console.error('[User Lifecycle] Error in beforeDelete:', error);
+        }
+    },
+
+    async afterDelete(event: any) {
+        console.log('[User Lifecycle] afterDelete triggered');
+        const { state } = event;
+
+        if (!state) return;
+
+        // 1. Decrement Heatmap
+        if (state.h3index) {
+            console.log(`[User Lifecycle] Decrementing Heatmap for H3: ${state.h3index}`);
+            await decrementHeatMap(state.h3index);
+        }
+
+        // 2. Recompute Rarity for Pins
+        if (state.pinIds && state.pinIds.length > 0) {
+            console.log(`[User Lifecycle] Recomputing rarity for ${state.pinIds.length} pins...`);
+            for (const pinId of state.pinIds) {
+                try {
+                    // @ts-ignore
+                    await strapi.service('api::pin.rarity').computeRarity(pinId);
+                } catch (error) {
+                    console.error(`[User Lifecycle] Error recomputing rarity for pin ${pinId}:`, error);
+                }
+            }
         }
     },
 };

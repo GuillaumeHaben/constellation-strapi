@@ -1,0 +1,12 @@
+node_modules
+.tmp
+build
+coverage
+uploads
+.git
+.gitignore
+.vscode
+.env
+.env.*
+npm-debug.log
+**/*.md

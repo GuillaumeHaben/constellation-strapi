@@ -141,6 +141,9 @@
     },
     "lastSeenChangelogAt": {
       "type": "datetime"
+    },
+    "lastSeenAt": {
+      "type": "datetime"
     }
   }
 }

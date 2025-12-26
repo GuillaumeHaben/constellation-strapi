@@ -33,6 +33,13 @@ async function geocodeAddress(address: string) {
 }
 
 async function updateH3Index(data: any, previousData: any = null) {
+    // 🛡️ Guard against double processing in the same lifecycle chain
+    // This happens when Strapi triggers beforeUpdate multiple times for a single request
+    if (data._h3Processed) {
+        console.log('[User Lifecycle] H3 already processed for this data object. Skipping.');
+        return;
+    }
+
     console.log(`[User Lifecycle] Processing location for user. New address: "${data.address}", Old address: "${previousData?.address}"`);
 
     // Handle address removal
@@ -43,6 +50,7 @@ async function updateH3Index(data: any, previousData: any = null) {
         }
         data.h3index = null;
         data.geocodedAt = new Date();
+        data._h3Processed = true;
         return;
     }
 
@@ -56,6 +64,13 @@ async function updateH3Index(data: any, previousData: any = null) {
             // STRICT CHECK: Only proceed if the index is actually different
             // This prevents race conditions where multiple localized updates trigger multiple increments
             if (newH3Index && newH3Index !== previousData?.h3index) {
+                // Double check: if data.h3index is already the new one, we probably already did this
+                if (data.h3index === newH3Index) {
+                    console.log('[User Lifecycle] H3 index already matches target in data. Skipping increment.');
+                    data._h3Processed = true;
+                    return;
+                }
+
                 if (previousData?.h3index) {
                     console.log(`[User Lifecycle] Changing location. Decrementing old H3: ${previousData.h3index}`);
                     await decrementHeatMap(previousData.h3index);
@@ -67,11 +82,13 @@ async function updateH3Index(data: any, previousData: any = null) {
                 data.latitude = geo.latitude;
                 data.longitude = geo.longitude;
             }
+            data._h3Processed = true;
         } else {
             console.error(`[User Lifecycle] Geocoding failed for address: ${data.address}`);
         }
     } else {
         console.log(`[User Lifecycle] No address change or h3index already present. Skipping geocoding.`);
+        data._h3Processed = true;
     }
 }
 
@@ -188,15 +205,37 @@ export default {
     async beforeUpdate(event: any) {
         const requestId = Math.random().toString(36).substring(7);
         console.log(`[User Lifecycle] beforeUpdate triggered (ReqID: ${requestId})`);
+
         const { data, where } = event.params;
 
-        // Fetch existing data to compare and handle count updates
         try {
+            // 1️⃣ Load previous user state
             // @ts-ignore
-            const previousData = await strapi.db.query('plugin::users-permissions.user').findOne({ where });
+            const previousData = await strapi.db
+                .query('plugin::users-permissions.user')
+                .findOne({ where });
+
+            // 2️⃣ Your existing logic
             await updateH3Index(data, previousData);
+
+            // 3️⃣ Clean pins: only published + deduplicate by documentId
+            if (data.pins?.length) {
+                const pins = await strapi.db.query('api::pin.pin').findMany({
+                    where: { id: { $in: data.pins }, publishedAt: { $notNull: true } },
+                });
+
+                const map = new Map<string, number>();
+                for (const pin of pins) {
+                    if (!map.has(pin.documentId)) {
+                        map.set(pin.documentId, pin.id);
+                    }
+                }
+
+                // Overwrite data.pins with clean, published, deduplicated IDs
+                data.pins = Array.from(map.values());
+            }
         } catch (error) {
-            console.error(`[User Lifecycle] Error fetching previous data (ReqID: ${requestId}):`, error);
+            console.error(`[User Lifecycle] Error in beforeUpdate (ReqID: ${requestId}):`, error);
         }
     },
 

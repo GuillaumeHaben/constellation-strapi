@@ -1015,6 +1015,7 @@ export interface PluginUsersPermissionsUser
     h3index: Schema.Attribute.String;
     instagram: Schema.Attribute.String;
     lastName: Schema.Attribute.String;
+    lastSeenAt: Schema.Attribute.DateTime;
     lastSeenChangelogAt: Schema.Attribute.DateTime;
     latitude: Schema.Attribute.Float;
     linkedin: Schema.Attribute.String;

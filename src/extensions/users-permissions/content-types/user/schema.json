@@ -81,6 +81,12 @@
       "target": "api::pin.pin",
       "mappedBy": "users"
     },
+    "awards": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::award.award",
+      "mappedBy": "users"
+    },
     "profilePicture": {
       "type": "media",
       "multiple": false,

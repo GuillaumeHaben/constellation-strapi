@@ -1046,70 +1046,17 @@ export interface PluginUsersPermissionsUser
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    country: Schema.Attribute.Enumeration<
-      [
-        'Austria',
-        'Belgium',
-        'Czech Republic',
-        'Denmark',
-        'Estonia',
-        'Finland',
-        'France',
-        'Germany',
-        'Greece',
-        'Hungary',
-        'Ireland',
-        'Italy',
-        'Luxembourg',
-        'Netherlands',
-        'Norway',
-        'Poland',
-        'Portugal',
-        'Romania',
-        'Slovenia',
-        'Spain',
-        'Sweden',
-        'Switzerland',
-        'United Kingdom',
-      ]
-    >;
+    country: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    directorate: Schema.Attribute.Enumeration<
-      [
-        'TEC',
-        'NAV',
-        'DG',
-        'RES',
-        'CIC',
-        'SCI',
-        'STS',
-        'SLE',
-        'HRE',
-        'EOP',
-        'OPS',
-        'CSC',
-      ]
-    >;
+    directorate: Schema.Attribute.String;
     email: Schema.Attribute.Email &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
-    esaSite: Schema.Attribute.Enumeration<
-      [
-        'ESTEC',
-        'HQ',
-        'ESOC',
-        'ESAC',
-        'ESRIN',
-        'EAC',
-        'Space Port',
-        'ESEC',
-        'ECSAT',
-      ]
-    >;
+    esaSite: Schema.Attribute.String;
     facebook: Schema.Attribute.String;
     firstName: Schema.Attribute.String;
     geocodedAt: Schema.Attribute.DateTime;
@@ -1128,8 +1075,6 @@ export interface PluginUsersPermissionsUser
     > &
       Schema.Attribute.Private;
     longitude: Schema.Attribute.Float;
-    otp_challenge_id: Schema.Attribute.UID;
-    otp_verified: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
@@ -1137,17 +1082,7 @@ export interface PluginUsersPermissionsUser
       }>;
     phoneNumber: Schema.Attribute.String;
     pins: Schema.Attribute.Relation<'manyToMany', 'api::pin.pin'>;
-    position: Schema.Attribute.Enumeration<
-      [
-        'Intern',
-        'YGT',
-        'IRF',
-        'JP',
-        'Staff',
-        'Contractor',
-        'Visiting researcher',
-      ]
-    >;
+    position: Schema.Attribute.String;
     profilePicture: Schema.Attribute.Media<'images'>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;

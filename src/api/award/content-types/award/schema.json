@@ -1,0 +1,66 @@
+{
+  "kind": "collectionType",
+  "collectionName": "awards",
+  "info": {
+    "singularName": "award",
+    "pluralName": "awards",
+    "displayName": "Award",
+    "description": "System and manual achievements for users"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "requirement": {
+      "type": "text",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "irl",
+        "pin",
+        "club",
+        "special"
+      ],
+      "default": "special"
+    },
+    "iconName": {
+      "type": "string",
+      "required": true
+    },
+    "bgGradient": {
+      "type": "string"
+    },
+    "isDynamic": {
+      "type": "boolean",
+      "default": false
+    },
+    "dynamicType": {
+      "type": "enumeration",
+      "enum": [
+        "pin_count",
+        "encounter_count",
+        "club_count",
+        "site_count",
+        "country_count",
+        "directorate_count",
+        "has_legendary_pin"
+      ]
+    },
+    "threshold": {
+      "type": "integer"
+    },
+    "users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "awards"
+    }
+  }
+}

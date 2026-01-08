@@ -9,8 +9,16 @@ export default {
             try {
                 // @ts-ignore
                 await strapi.service('api::pin.rarity').computeRarity(result.id);
+
+                // Trigger award evaluation for connected users
+                if (params.data.users.connect) {
+                    for (const userId of params.data.users.connect) {
+                        const id = typeof userId === 'object' ? userId.id : userId;
+                        await strapi.service('api::award.award').evaluateUserAwards(id);
+                    }
+                }
             } catch (error) {
-                console.error(`Error computing rarity for pin ${result.id}:`, error);
+                console.error(`Error processing updates for pin ${result.id}:`, error);
             }
         }
     },

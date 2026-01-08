@@ -373,6 +373,54 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAwardAward extends Struct.CollectionTypeSchema {
+  collectionName: 'awards';
+  info: {
+    description: 'System and manual achievements for users';
+    displayName: 'Award';
+    pluralName: 'awards';
+    singularName: 'award';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    bgGradient: Schema.Attribute.String;
+    category: Schema.Attribute.Enumeration<['irl', 'pin', 'club', 'special']> &
+      Schema.Attribute.DefaultTo<'special'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    dynamicType: Schema.Attribute.Enumeration<
+      [
+        'pin_count',
+        'encounter_count',
+        'club_count',
+        'site_count',
+        'country_count',
+        'directorate_count',
+        'has_legendary_pin',
+      ]
+    >;
+    iconName: Schema.Attribute.String & Schema.Attribute.Required;
+    isDynamic: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::award.award'> &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    requirement: Schema.Attribute.Text & Schema.Attribute.Required;
+    threshold: Schema.Attribute.Integer;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    users: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiChangelogChangelog extends Struct.CollectionTypeSchema {
   collectionName: 'changelogs';
   info: {
@@ -993,21 +1041,75 @@ export interface PluginUsersPermissionsUser
   };
   attributes: {
     address: Schema.Attribute.String;
+    awards: Schema.Attribute.Relation<'manyToMany', 'api::award.award'>;
     birthday: Schema.Attribute.Date;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    country: Schema.Attribute.String;
+    country: Schema.Attribute.Enumeration<
+      [
+        'Austria',
+        'Belgium',
+        'Czech Republic',
+        'Denmark',
+        'Estonia',
+        'Finland',
+        'France',
+        'Germany',
+        'Greece',
+        'Hungary',
+        'Ireland',
+        'Italy',
+        'Luxembourg',
+        'Netherlands',
+        'Norway',
+        'Poland',
+        'Portugal',
+        'Romania',
+        'Slovenia',
+        'Spain',
+        'Sweden',
+        'Switzerland',
+        'United Kingdom',
+      ]
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    directorate: Schema.Attribute.String;
+    directorate: Schema.Attribute.Enumeration<
+      [
+        'TEC',
+        'NAV',
+        'DG',
+        'RES',
+        'CIC',
+        'SCI',
+        'STS',
+        'SLE',
+        'HRE',
+        'EOP',
+        'OPS',
+        'CSC',
+      ]
+    >;
     email: Schema.Attribute.Email &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
-    esaSite: Schema.Attribute.String;
+    esaSite: Schema.Attribute.Enumeration<
+      [
+        'ESTEC',
+        'HQ',
+        'ESOC',
+        'ESAC',
+        'ESRIN',
+        'EAC',
+        'Space Port',
+        'ESEC',
+        'ECSAT',
+      ]
+    >;
     facebook: Schema.Attribute.String;
     firstName: Schema.Attribute.String;
     geocodedAt: Schema.Attribute.DateTime;
@@ -1026,6 +1128,8 @@ export interface PluginUsersPermissionsUser
     > &
       Schema.Attribute.Private;
     longitude: Schema.Attribute.Float;
+    otp_challenge_id: Schema.Attribute.UID;
+    otp_verified: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
@@ -1033,7 +1137,17 @@ export interface PluginUsersPermissionsUser
       }>;
     phoneNumber: Schema.Attribute.String;
     pins: Schema.Attribute.Relation<'manyToMany', 'api::pin.pin'>;
-    position: Schema.Attribute.String;
+    position: Schema.Attribute.Enumeration<
+      [
+        'Intern',
+        'YGT',
+        'IRF',
+        'JP',
+        'Staff',
+        'Contractor',
+        'Visiting researcher',
+      ]
+    >;
     profilePicture: Schema.Attribute.Media<'images'>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
@@ -1067,6 +1181,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::award.award': ApiAwardAward;
       'api::changelog.changelog': ApiChangelogChangelog;
       'api::club.club': ApiClubClub;
       'api::encounter.encounter': ApiEncounterEncounter;
